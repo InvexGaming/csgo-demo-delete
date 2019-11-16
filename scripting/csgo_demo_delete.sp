@@ -51,12 +51,15 @@ public Action Command_Delete_Demos(int client, int args)
     //Get the epoch timestamp for the file creation date
     char demoFilePath[256];
     Format(demoFilePath, sizeof(demoFilePath), "demo/%s", buffer);
-    int creationTimestamp = GetFileTime(demoFilePath, FileTime_Created);
+    int creationTimestamp = GetFileTime(demoFilePath, FileTime_LastAccess);
     
     //Check for error
     if (creationTimestamp == -1)
+    {
+      LogError("Failed to get FileTime_LastAccess for demo file at %s.", demoFilePath);
       continue;
-    
+    }
+
     //Otherwise, check for old demos
     if (GetTime() - creationTimestamp > GetConVarInt(cvar_demo_save_time)) {
       //This is an old file, delete it
